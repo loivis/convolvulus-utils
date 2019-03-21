@@ -2,6 +2,7 @@ package http
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -68,7 +69,7 @@ func decodeHTMLBody(body io.Reader) (io.Reader, error) {
 }
 
 // Search returns the first link from google search
-func Search(q string) string {
+func Search(q string) (string, error) {
 	query := &url.Values{
 		"q":   {q},
 		"num": {"5"},
@@ -77,14 +78,12 @@ func Search(q string) string {
 
 	res, err := gsClient.Search(query)
 	if err != nil {
-		log.Println(err)
-		return ""
+		return "", err
 	}
 
 	if len(res) == 0 {
-		log.Printf("no search result for %q", q)
-		return ""
+		return "", fmt.Errorf("no search result for %q", q)
 	}
 
-	return res[0].Link
+	return res[0].Link, nil
 }
